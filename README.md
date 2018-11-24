@@ -3,7 +3,7 @@
 Modificar el mail.properties con usuario y contraseña, dicho correo debe tener habilitado el servidor smtp, usaremos gmail en este ejemplo
 
 ```
-git clone https://github.com/newUserRepo/EmailSenderPoC.git
+git clone https://github.com/newUserRepo/PoCEmailSender.git
 ```
 cd emailsenderpoc
 
