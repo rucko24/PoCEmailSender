@@ -5,7 +5,7 @@ Modificar el mail.properties con usuario y contraseña, dicho correo debe tener 
 ```
 git clone https://github.com/newUserRepo/PoCEmailSender.git
 ```
-cd emailsenderpoc
+cd pocemailsender
 
 luego ejecutar con el siguente comando
 ```
