@@ -1,4 +1,4 @@
-package com.example.javamail.executarNextMonth;
+package com.example.javamail.executarnextmonth;
 
 import com.example.javamail.EmailSender;
 import com.example.javamail.util.ShowData;
@@ -16,10 +16,11 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 
 @SpringComponent
-public class TimerClass implements Job, ShowData {
+public class TimerClass implements Job , ShowData {
 
     @Autowired
     private EmailSender emailSender;
@@ -31,14 +32,30 @@ public class TimerClass implements Job, ShowData {
         final String mimeType = uploadComponent.getMimeType();
         final Path file = uploadComponent.getPath();
 
-        try (final BufferedInputStream attachment = new BufferedInputStream(Files.newInputStream(file))) {
-
-            emailSender.send(titulo, attachment, nombreArchivo, mimeType);
-
-        } catch (IOException | MessagingException ex) {
-            ex.printStackTrace();
-            UI.getCurrent().access(() -> Notification.show("Error al enviar"));
+        /**
+         * @param check NPE para enviar sin adjuntos
+         */
+        if(Objects.isNull(file)) {
+            try {
+                emailSender.send();
+            } catch (MessagingException | IOException e) {
+                getLogger().error(null,e);
+            }
         }
+        /**
+         * Mandar ajunto si se adjunto un archivo
+         */
+        if(Objects.nonNull(file)) {
+            try (final BufferedInputStream attachment = new BufferedInputStream(Files.newInputStream(file))) {
+
+                emailSender.send(titulo, attachment, nombreArchivo, mimeType);
+
+            } catch (IOException | MessagingException ex) {
+                getLogger().error(null,ex);
+                UI.getCurrent().access(() -> Notification.show("Error al enviar"));
+            }
+        }
+
     }
 
     @Override

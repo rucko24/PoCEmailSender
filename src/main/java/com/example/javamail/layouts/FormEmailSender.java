@@ -1,9 +1,9 @@
 package com.example.javamail.layouts;
 
-import com.example.javamail.SetDataForMail;
 import com.example.javamail.EmailSender;
-import com.example.javamail.executarNextMonth.RunNextTask;
-import com.example.javamail.util.ShowData;
+import com.example.javamail.SetDataForMail;
+import com.example.javamail.executarnextmonth.RunNextTask;
+import com.example.javamail.executarnextmonth.Tiempos;
 import com.example.javamail.util.UploadComponent;
 import com.example.javamail.util.ValidateMultipleMails;
 import com.github.appreciated.app.layout.annotations.MenuCaption;
@@ -19,25 +19,28 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @UIScope
 @SpringView(name = "") // in Spring an empty view name is also the default view
 @MenuCaption("Home View")
 @MenuIcon(VaadinIcons.HOME)
-public class FormEmailSender extends HorizontalLayout implements ShowData, View, SetDataForMail {
+public class FormEmailSender extends HorizontalLayout implements View, SetDataForMail {
 
     private final Label labelTitulo = new Label("PoC Email Sender");
     private final ProgressBar progressBar = new ProgressBar();
     private final Binder<FormEmailBean> binder = new Binder<>(FormEmailBean.class);
     private final TextArea descripcion = new TextArea("Descripción");
-    private final ComboBox<String> tiempos = new ComboBox<String>("Tiempo en");
+    private final ComboBox<Tiempos> tiempos = new ComboBox<>("Tiempo en");
     private final Slider slider = new Slider("Retardo");
     private final TextField para = new TextField("Para");
     private final Button buttonValidate = new Button("Enviar email");
     private final FormLayout formLayout = new FormLayout();
+
     private String tiposDeTiempos;
+    private Tiempos tiempo;
+
     private final Label labelExpresionCron = new Label();
     private final VerticalLayout verticalLayoutContent = new VerticalLayout();
 
@@ -106,6 +109,9 @@ public class FormEmailSender extends HorizontalLayout implements ShowData, View,
         initBehaviour();
     }
 
+    /**
+     * Validador del formulario
+     */
     private void initBinder() {
         binder.forField(descripcion)
                 .asRequired()
@@ -122,11 +128,11 @@ public class FormEmailSender extends HorizontalLayout implements ShowData, View,
      */
     private void initBehaviour() {
 
-        tiempos.setItems(Arrays.asList("Segundos", "Minutos", "Horas", "Meses"));
+
+
+        tiempos.setItems(Tiempos.values());
         tiempos.setEmptySelectionAllowed(false);
-        tiempos.addValueChangeListener(e -> {
-            tiposDeTiempos = e.getValue().toUpperCase();
-        });
+        tiempos.addValueChangeListener(e ->tiempo = e.getValue());
 
         buttonValidate.addClickListener(e -> {
             final BinderValidationStatus<FormEmailBean> status = binder.validate();
@@ -134,7 +140,7 @@ public class FormEmailSender extends HorizontalLayout implements ShowData, View,
                 setDataForMail(getUI(), para.getValue().trim(), descripcion.getValue().trim());
                 final Integer valueTime = slider.getValue().intValue();
                 addLabelResult();
-                runNextTask.initTimeBuilder(tiposDeTiempos, valueTime, labelExpresionCron);
+                runNextTask.initTimeBuilder(tiempo, valueTime, labelExpresionCron);
 
             } else {
                 Notification.show("Invalid form", Notification.Type.ERROR_MESSAGE);
@@ -154,4 +160,32 @@ public class FormEmailSender extends HorizontalLayout implements ShowData, View,
         emailSender.setData(ui, destinario, descripcion, progressBar,uploadComponent);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FormEmailSender)) return false;
+        if (!super.equals(o)) return false;
+        FormEmailSender that = (FormEmailSender) o;
+        return Objects.equals(labelTitulo, that.labelTitulo) &&
+                Objects.equals(progressBar, that.progressBar) &&
+                Objects.equals(binder, that.binder) &&
+                Objects.equals(descripcion, that.descripcion) &&
+                Objects.equals(tiempos, that.tiempos) &&
+                Objects.equals(slider, that.slider) &&
+                Objects.equals(para, that.para) &&
+                Objects.equals(buttonValidate, that.buttonValidate) &&
+                Objects.equals(formLayout, that.formLayout) &&
+                Objects.equals(tiposDeTiempos, that.tiposDeTiempos) &&
+                tiempo == that.tiempo &&
+                Objects.equals(labelExpresionCron, that.labelExpresionCron) &&
+                Objects.equals(verticalLayoutContent, that.verticalLayoutContent) &&
+                Objects.equals(uploadComponent, that.uploadComponent) &&
+                Objects.equals(runNextTask, that.runNextTask) &&
+                Objects.equals(emailSender, that.emailSender);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), labelTitulo, progressBar, binder, descripcion, tiempos, slider, para, buttonValidate, formLayout, tiposDeTiempos, tiempo, labelExpresionCron, verticalLayoutContent, uploadComponent, runNextTask, emailSender);
+    }
 }

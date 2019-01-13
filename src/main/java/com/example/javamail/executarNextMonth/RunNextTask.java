@@ -1,37 +1,14 @@
-package com.example.javamail.executarNextMonth;
+package com.example.javamail.executarnextmonth;
 
+import com.example.javamail.util.GenericBuilder;
 import com.example.javamail.util.ShowData;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Label;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.EnumSet;
-
-enum Tiempos {
-
-    SEGUNDOS("SEGUNDOS"),
-    MINUTOS("MINUTOS"),
-    HORAS("HORAS"),
-    MESES("MESES");
-
-    private String tiempos;
-
-    Tiempos(final String tiempos) {
-        this.tiempos = tiempos;
-    }
-    public String getTiempos() {
-        return tiempos;
-    }
-    public static Tiempos getTiemposValues(final String tiempos) {
-        return EnumSet.allOf(Tiempos.class)
-                .stream()
-                .filter(obj -> obj.getTiempos().equals(tiempos))
-                .findFirst()
-                .get();
-    }
-}
 
 @SpringComponent
 public class RunNextTask implements ShowData {
@@ -39,21 +16,12 @@ public class RunNextTask implements ShowData {
     @Autowired
     private ExecTimer execTimer;
     private ZonedDateTime zonedDateTime;
-    private String tiemposDeTiempos;
-    private Integer valueTime;
     private TimeBean timeBean;
-    /**
-     * Send 1min later
-     * se ejecuta sola una vez
-     * si se desea ejecutar repetidamente tocara modificar la expresion cron
-     */
 
-    public void initTimeBuilder(final String tiposDeTiempos, final Integer valueTime, Label label) {
-        this.tiemposDeTiempos = tiposDeTiempos;
-        this.valueTime = valueTime;
+
+    public void initTimeBuilder(final Tiempos tiposTiempos, final Integer valueTime, Label label) {
         try {
-            final Tiempos tiempos = Tiempos.getTiemposValues(tiposDeTiempos);
-            switch (tiempos) {
+            switch (tiposTiempos) {
                 case SEGUNDOS:
                     zonedDateTime = getZoneDateTime().plusSeconds(valueTime);
                     timeBean = getTimeBeanBuilder();
@@ -71,7 +39,9 @@ public class RunNextTask implements ShowData {
                     timeBean = getTimeBeanBuilder();
                     break;
             }
-        }catch (Exception ex){ex.printStackTrace();}
+        }catch (Exception ex){
+            getLogger().error(null,ex);
+        }
         execTimer.setTimeBean(timeBean);
         label.setValue("Expresión cron "+timeBean.toString());
         execTimer.initTask();
@@ -84,10 +54,12 @@ public class RunNextTask implements ShowData {
         final ZoneId zoneId = ZoneId.of("Europe/Madrid");
         final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.now(),zoneId).plusMonths(1);
         //para crear una tarea mensual el builder es valido asi segun cronmaker
-        final TimeBean timeBean = new TimeBean.Builder()
-                .withDay(zonedDateTime.getDayOfMonth())//el dia es requerido
-                .withMonth(zonedDateTime.getMonthValue()) //el mes es requrido
+
+        final TimeBean timeBean = GenericBuilder.of(TimeBean::new)
+                .with(TimeBean::setDay,zonedDateTime.getDayOfMonth())
+                .with(TimeBean::setMonth,zonedDateTime.getMonthValue())
                 .build();
+
         execTimer.setTimeBean(timeBean);
         execTimer.initTask();
     }
@@ -97,13 +69,12 @@ public class RunNextTask implements ShowData {
     }
 
     private TimeBean getTimeBeanBuilder() {
-        final TimeBean timeBean = new TimeBean.Builder()
-                .withSec(this.zonedDateTime.getSecond())
-                .withMin(this.zonedDateTime.getMinute())
-                .withHour(this.zonedDateTime.getHour())
-                .withDay(this.zonedDateTime.getDayOfMonth())//el dia es requerido
-                .withMonth(this.zonedDateTime.getMonthValue()) //el mes es requrido
+        return GenericBuilder.of(TimeBean::new)
+                .with(TimeBean::setSec,this.zonedDateTime.getSecond())
+                .with(TimeBean::setMin,this.zonedDateTime.getMinute())
+                .with(TimeBean::setHour,this.zonedDateTime.getHour())
+                .with(TimeBean::setDay,this.zonedDateTime.getDayOfMonth())
+                .with(TimeBean::setMonth,this.zonedDateTime.getMonthValue())
                 .build();
-        return timeBean;
     }
 }

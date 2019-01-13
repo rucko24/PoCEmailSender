@@ -1,20 +1,15 @@
-package com.example.javamail.executarNextMonth;
+package com.example.javamail.executarnextmonth;
 
-public class TimeBean {
+/**
+ * @implSpec probar a fondo la inmutablidad con el GenericBuilder
+ */
+public final class TimeBean {
 
-    private final int sec;
-    private final int min;
-    private final int hour;
-    private final int day;
-    private final int month;
-
-    private TimeBean(final Builder builder) {
-        this.sec = builder.sec;
-        this.min = builder.min;
-        this.hour = builder.hour;
-        this.day = builder.day;
-        this.month = builder.month;
-    }
+    private  int sec;
+    private  int min;
+    private  int hour;
+    private  int day;
+    private  int month;
 
     public int getSec() {
         return sec;
@@ -36,6 +31,26 @@ public class TimeBean {
         return month;
     }
 
+    public void setSec(int sec) {
+        this.sec = sec;
+    }
+
+    public void setMin(int min) {
+        this.min = min;
+    }
+
+    public void setHour(int hour) {
+        this.hour = hour;
+    }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
     @Override
     public String toString() {
         final StringBuilder expresionCron = new StringBuilder()
@@ -53,35 +68,4 @@ public class TimeBean {
         return expresionCron.toString();
     }
 
-    public static class Builder {
-        private int sec;
-        private int min;
-        private int hour;
-        private int day;
-        private int month;
-
-        public Builder withSec(final int sec) {
-            this.sec = sec;
-            return this;
-        }
-        public Builder withMin(final int min) {
-            this.min = min;
-            return this;
-        }
-        public Builder withHour(final int hour) {
-            this.hour = hour;
-            return this;
-        }
-        public Builder withDay(final int day) {
-            this.day = day;
-            return this;
-        }
-        public Builder withMonth(final int month) {
-            this.month = month;
-            return this;
-        }
-        public TimeBean build() {
-            return new TimeBean(this);
-        }
-    }
 }

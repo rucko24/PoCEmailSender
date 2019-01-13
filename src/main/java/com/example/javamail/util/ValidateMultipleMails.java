@@ -27,7 +27,7 @@ public class ValidateMultipleMails implements Validator<String> {
                 break;
             }
         }
-        if (value == true) {
+        if (value) {
             return ValidationResult.ok();
         } else {
             return ValidationResult.error(errorMessage);

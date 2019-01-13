@@ -1,5 +1,6 @@
 package com.example.javamail;
 
+import com.example.javamail.util.ShowData;
 import com.example.javamail.util.UploadComponent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
@@ -26,7 +27,7 @@ import java.util.stream.IntStream;
  * @author rub´n
  **/
 @Service
-public class EmailSender {
+public class EmailSender implements ShowData {
 
     private static final String MAIL_PROPERTIES = "src/main/resources/mail.properties";
     private String destinatario;
@@ -42,13 +43,11 @@ public class EmailSender {
     private String password;
 
     /**
-     * Envio de correo sin adjuntos
+     * Envio de correo sin adjunto
      *
-     * @param destinatario
-     * @param description
      */
-    public void send(String destinatario, String description) throws MessagingException, IOException {
-        send(Arrays.asList(destinatario), description, null, null, null);
+    public void send() throws MessagingException, IOException {
+        send(Arrays.asList(destinatario), descripcion, null, null, null);
     }
 
 
@@ -103,7 +102,7 @@ public class EmailSender {
             try {
                 helper.setTo(InternetAddress.parse(replace(index)));
             } catch (MessagingException e) {
-                e.printStackTrace();
+                getLogger().error(null,e);
                 ui.access(() -> {
                     Notification.show("Error con destinatarios", Notification.Type.ERROR_MESSAGE);
                     bar.setVisible(false);
@@ -120,13 +119,13 @@ public class EmailSender {
                             final ByteArrayDataSource byteArrayDataSource = new ByteArrayDataSource(adjuntos.get(count), mimeType.get(count));
                             helper.addAttachment(nombre.get(count), byteArrayDataSource);
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            getLogger().error(null,ex);
                         }
                     });
         }
 
         mailSender.send(message);
-        System.out.println("Email enviado");
+        getLogger().info("Email enviado");
         ui.access(() -> {
             Notification.show("Email enviado");
             bar.setVisible(false);

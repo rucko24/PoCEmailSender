@@ -2,7 +2,6 @@ package com.example.javamail;
 
 import com.example.javamail.layouts.FormEmailSender;
 import com.github.appreciated.app.layout.AppLayout;
-import com.github.appreciated.app.layout.behaviour.AppLayoutComponent;
 import com.github.appreciated.app.layout.behaviour.Behaviour;
 import com.github.appreciated.app.layout.builder.design.AppLayoutDesign;
 import com.github.appreciated.app.layout.builder.entities.DefaultBadgeHolder;
@@ -37,7 +36,7 @@ public class ExampleUI extends UI {
 
     private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
     private DefaultBadgeHolder badge = new DefaultBadgeHolder();
-    private AppLayoutComponent layout;
+
     @Autowired
     private SpringViewProvider springViewProvider;
 
@@ -45,7 +44,7 @@ public class ExampleUI extends UI {
     protected void init(VaadinRequest vaadinRequest) {
         getPage().setTitle("Poc-EmailSender");
 
-        layout = AppLayout.getCDIBuilder(Behaviour.LEFT_RESPONSIVE_HYBRID)
+        setContent(AppLayout.getCDIBuilder(Behaviour.LEFT_RESPONSIVE_HYBRID)
                 .withViewProvider(() -> springViewProvider)
                 .withNavigationElementInfoProducer(new DefaultSpringNavigationElementInfoProducer())
                 .withTitle("PoC Email Sender")
@@ -53,8 +52,7 @@ public class ExampleUI extends UI {
                 .withDesign(AppLayoutDesign.MATERIAL)
                 .add(new MenuHeader("v1.0 by rubn", new ThemeResource("img/rubn.jpg")), HEADER)
                 .add("Home", VaadinIcons.ARROW_RIGHT, badge, FormEmailSender.class)
-                .build();
-        setContent(layout);
+                .build());
     }
 
 
