@@ -1,4 +1,4 @@
-# [PoC Email Sender](https://info0x52.blogspot.com/2018/10/poc-email-sender-con-springboot-y.html)
+# [PoC Email Sender](https://rubn0x52.com/2018/10/30/email-sender-with-springboot-and-vaadin-8.5.2/)
 
 Modificar el mail.properties con usuario y contraseña, dicho correo debe tener habilitado el servidor smtp, usaremos gmail en este ejemplo
 
